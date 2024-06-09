@@ -1,0 +1,53 @@
+
+
+
+body{
+    background-color: teal;
+}
+
+
+
+
+#cancelled {
+    margin: 20px;
+}
+
+#cancelled table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#cancelled th, #cancelled td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#cancelled th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+}
+
+#cancelled tr {
+    background-color: blanchedalmond;
+}
+
+#cancelled tr:hover {
+    background-color: moccasin;
+}
+
+#cancelled td {
+    color: blueviolet
+}
+
+#cancelled th, #cancelled td {
+    padding: 12px 15px;
+}
+
+#cancelled table {
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
