@@ -1,45 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Airline Management System</title>
     <link rel="stylesheet" href="search.css" />
-  </head>
-  <body>
+</head>
+<body>
     <div id="navbar"></div>
     <h1 class="title">Welcome to Airline Management System</h1>
-    <form class="search-form">
-      <label for="origin">Origin</label>
-      <select name="origin" id="origin">
-        <option value="">Select Origin</option>
-        <option value="Mumbai">Mumbai</option>
-        <option value="Delhi">Delhi</option>
-        <option value="Chennai">Chennai</option>
-        <option value="Hyderabad">Hyderabad</option>
-        <option value="Bengaluru">Bengaluru</option>
-      </select>
-      <label for="destination">Destination</label>
-      <select name="destination" id="destination">
-        <option value="">Select Destination</option>
-        <option value="Mumbai">Mumbai</option>
-        <option value="Delhi">Delhi</option>
-        <option value="Chennai">Chennai</option>
-        <option value="Hyderabad">Hyderabad</option>
-        <option value="Bengaluru">Bengaluru</option>
-      </select>
-      <label for="departure">Departure Date</label>
-      <input type="date" name="departure" id="departure" />
-      <label for="travellers">No of Travellers</label>
-      <input type="number" name="travellers" id="travellers" />
-      <label for="class">Class</label>
-      <select name="class" id="class">
-        <option value="Economy">Economy</option>
-        <option value="Executive">Executive</option>
-        <option value="Business">Business</option>
-      </select>
-      <input type="submit" value="Search" />
+    <form class="search-form" id="searchForm">
+        <label for="origin">Origin</label>
+        <select name="origin" id="origin" required>
+            <option value="">Select Origin</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Chennai">Chennai</option>
+            <option value="Hyderabad">Hyderabad</option>
+            <option value="Bengaluru">Bengaluru</option>
+        </select>
+        <label for="destination">Destination</label>
+        <select name="destination" id="destination" required>
+            <option value="">Select Destination</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Chennai">Chennai</option>
+            <option value="Hyderabad">Hyderabad</option>
+            <option value="Bengaluru">Bengaluru</option>
+        </select>
+        <label for="departure">Departure Date</label>
+        <input type="date" name="departure" id="departure" required/>
+        <label for="travellers">No of Travellers</label>
+        <input type="number" name="travellers" id="travellers" required/>
+        <label for="class">Class</label>
+        <select name="class" id="class" required>
+            <option value="Economy">Economy</option>
+            <option value="Executive">Executive</option>
+            <option value="Business">Business</option>
+        </select>
+        <input type="submit" value="Search" />
     </form>
     <script src="nav.js"></script>
-  </body>
+    <script src="search.js"></script>
+</body>
 </html>
