@@ -2,7 +2,7 @@ package com.Model;
 
 import java.time.LocalDate;
 
-class  FlightBooking
+public class  FlightBooking
 {
     private static int bookingIdCounter = 1;
     private int bookingId;
@@ -87,5 +87,8 @@ class  FlightBooking
         this.dateOfTravel = dateOfTravel;
         this.bookingStatus = bookingStatus;
         this.bookingAmount = bookingAmount;
+    }
+
+    public FlightBooking() {
     }
 }

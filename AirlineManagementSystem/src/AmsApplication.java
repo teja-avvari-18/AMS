@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 import static com.Dao.CarrierDao.*;
 import static com.Dao.FlightDao.*;
-import static com.Dao.UserDao.userRegistration;
+import static com.Dao.UserDao.*;
 
 public class AmsApplication
 {
@@ -37,8 +37,7 @@ public class AmsApplication
         }
     }
 
-    public static void adminSignIn() throws SQLException
-    {
+    public static void adminSignIn() throws SQLException, ClassNotFoundException {
         Scanner sc = new Scanner(System.in);
         System.out.println("Admin Sign In");
         System.out.println("Enter username");
@@ -82,8 +81,7 @@ public class AmsApplication
 
 
 
-    public static void displayAdminMenu(Scanner sc) throws SQLException
-    {
+    public static void displayAdminMenu(Scanner sc) throws SQLException, ClassNotFoundException {
         int choice;
         do
         {
@@ -112,9 +110,9 @@ public class AmsApplication
                 case 2:
                     editCarrierDetails();
                     break;
-//                case 3:
-//                    removeCarrierDetails();
-//                    break;
+                case 3:
+                    removeCarrierDetails();
+                    break;
 //                case 4:
 //                    calculateTotalRefundForCancelledFlights();
 //                    break;
@@ -136,10 +134,10 @@ public class AmsApplication
                 case 10:
                     editFlightDetails();
                     break;
-//                case 11:
-//                    removeFlightDetails();
-//                    break;
-//
+                case 11:
+                    removeFlightDetails();
+                    break;
+
                 default:
                     System.out.println("Invalid choice. Try again");
             }
@@ -173,9 +171,9 @@ public class AmsApplication
                 case 1:
                     userRegistration();
                     break;
-//                case 2:
-//                    updateUser();
-//                    break;
+                case 2:
+                    updateUser();
+                    break;
 //                case 3:
 //                    bookFlight();
 //                    break;
@@ -188,9 +186,9 @@ public class AmsApplication
 //                case 6:
 //                    searchFlightsBasedOnOriginDestinationAndDateofTravel();
 //                    break;
-//                case 7:
-//                    viewMyBookings();
-//                    break;
+                case 7:
+                    viewMyBookings();
+                    break;
 //                case 8:
 //                    cancelBooking();
 //                    break;

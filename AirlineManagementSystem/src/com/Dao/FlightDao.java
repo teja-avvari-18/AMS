@@ -353,5 +353,64 @@ public class FlightDao
 
     }
 
+    public static void removeFlightDetails() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter the flight Id");
+        int flightId = sc.nextInt();
+        sc.nextLine();
+
+        Connection conn = null;
+        PreparedStatement psmt = null;
+        ResultSet rs = null;
+
+        try
+        {
+            conn = DatabaseConnection.getConnection();
+            String checkFlight = "SELECT * FROM flight WHERE flight_id=?";
+            psmt = conn.prepareStatement(checkFlight);
+            psmt.setInt(1,flightId);
+            rs = psmt.executeQuery();
+
+            if(!rs.next())
+            {
+                System.out.println("Either the data is incorrect or no flight information is available for the given flight id " + flightId);
+            }
+
+            else
+            {
+                String bookedFlights = "SELECT * FROM flight_booking WHERE flight_id = ?";
+                psmt = conn.prepareStatement(bookedFlights);
+                psmt.setInt(1,flightId);
+                rs = psmt.executeQuery();
+
+                if(rs.next())
+                {
+                    System.out.println("Flight Information can't be removed as there are Active Booking open in the System. Please attempt to remove this flight either by cancelling all open ticket  or try after serving all open bookings");
+                }
+
+                else
+                {
+                    String deleteFlight = "DELETE FROM flight WHERE flight_id = ? ";
+                    psmt = conn.prepareStatement(deleteFlight);
+                    psmt.setInt(1,flightId);
+                    psmt.executeUpdate();
+                    System.out.println("Flight Information successfully removed from system");
+                }
+            }
+        }
+        catch (ClassNotFoundException | SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        finally
+        {
+            if(rs!=null) rs.close();
+            if(psmt!=null) psmt.close();
+            if(conn!=null) conn.close();
+        }
+    }
+
 
 }

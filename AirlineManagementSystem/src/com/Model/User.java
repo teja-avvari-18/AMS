@@ -19,9 +19,23 @@ public class User
     private long zipCode;
     private LocalDate dateofBirth;
     private String role="customer";
-    private String userCategory="";
+    private String userCategory;
 
-
+    public User(String userName, String password, long phone, String emailId, String address1, String address2, String city, String state, String country, long zipCode, LocalDate dateofBirth, String role, String userCategory) {
+        this.userName = userName;
+        this.password = password;
+        this.phone = phone;
+        this.emailId = emailId;
+        this.address1 = address1;
+        this.address2 = address2;
+        this.city = city;
+        this.state = state;
+        this.country = country;
+        this.zipCode = zipCode;
+        this.dateofBirth = dateofBirth;
+        this.role = role;
+        this.userCategory = userCategory;
+    }
 
     public String getAddress1() {
         return address1;

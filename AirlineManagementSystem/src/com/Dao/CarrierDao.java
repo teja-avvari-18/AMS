@@ -394,5 +394,67 @@ public class CarrierDao
     }
 
 
+    public static void removeCarrierDetails() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter the carrier Id");
+        int carrierId = sc.nextInt();
+        sc.nextLine();
+
+        Connection conn = null;
+        PreparedStatement psmt = null;
+        ResultSet rs = null;
+
+        try
+        {
+            conn = DatabaseConnection.getConnection();
+
+            String checkCarrier = "SELECT * FROM carrier WHERE carrier_id=?";
+            psmt = conn.prepareStatement(checkCarrier);
+            psmt.setInt(1,carrierId);
+            rs = psmt.executeQuery();
+
+            if(!rs.next())
+            {
+                System.out.println("Either the data is incorrect or no carrier information is available for the given carrier id " + carrierId);
+            }
+
+            else
+            {
+                String checkFlights = "SELECT * FROM flight WHERE carrier_id = ?";
+                psmt = conn.prepareStatement(checkFlights);
+                psmt.setInt(1,carrierId);
+                rs = psmt.executeQuery();
+
+                if(rs.next())
+                {
+                    System.out.println("Remove all flights mapped to this carrier before deleting this carrier from the system");
+                }
+
+                else
+                {
+                    String deleteCarrier = "DELETE FROM carrier WHERE carrier_id = ? ";
+                    psmt = conn.prepareStatement(deleteCarrier);
+                    psmt.setInt(1,carrierId);
+                    psmt.executeUpdate();
+                    System.out.println("Carrier Information successfully removed from the system");
+                }
+            }
+        }
+        catch (ClassNotFoundException | SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        finally
+        {
+            if(rs!=null) rs.close();
+            if(psmt!=null) psmt.close();
+            if(conn!=null) conn.close();
+        }
+
+    }
+
+
 
 }

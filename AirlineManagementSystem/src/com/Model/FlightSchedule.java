@@ -3,7 +3,7 @@ package com.Model;
 
 import java.time.LocalDate;
 
-class FlightSchedule
+public class FlightSchedule
 {
     private int flightScheduleId;
     private int flightId;
@@ -90,5 +90,8 @@ class FlightSchedule
                 ", economyClassBookedCount=" + economyClassBookedCount +
                 ", executiveClassBookedCount=" + executiveClassBookedCount +
                 '}';
+    }
+
+    public FlightSchedule() {
     }
 }
