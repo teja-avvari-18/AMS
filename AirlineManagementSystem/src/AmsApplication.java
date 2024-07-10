@@ -1,6 +1,7 @@
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import static com.Dao.BookingDao.cancelBooking;
 import static com.Dao.CarrierDao.*;
 import static com.Dao.FlightDao.*;
 import static com.Dao.UserDao.*;
@@ -189,9 +190,9 @@ public class AmsApplication
                 case 7:
                     viewMyBookings();
                     break;
-//                case 8:
-//                    cancelBooking();
-//                    break;
+                case 8:
+                    cancelBooking();
+                    break;
                 default:
                     System.out.println("Invalid choice. Try again");
             }
