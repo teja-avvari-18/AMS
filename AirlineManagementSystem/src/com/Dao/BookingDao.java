@@ -102,8 +102,7 @@ public class BookingDao
         }
     }
 
-    public static void cancelBooking() throws SQLException
-    {
+    public static void cancelBooking() throws SQLException {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Enter the bookingId");
@@ -112,51 +111,39 @@ public class BookingDao
 
         FlightBooking flightBooking = getFlightBookingsBasedOnBookingId(bookingId);
 
+        if(flightBooking == null) {
+            System.out.println("Booking is not present for this booking id");
+            return;
+        }
+
+        if("Cancelled".equalsIgnoreCase(flightBooking.getBookingStatus())) {
+            System.out.println("Booking is already cancelled");
+            return;
+        }
+
         double refundAmount = 0.0;
 
-        if(flightBooking == null)
-        {
-            System.out.println("Booking is not present for this booking id");
-        }
-
         LocalDate currentDate = LocalDate.now();
-        long daysOfDifference = ChronoUnit.DAYS.between(currentDate,flightBooking.getDateOfTravel());
+        long daysOfDifference = ChronoUnit.DAYS.between(currentDate, flightBooking.getDateOfTravel());
 
-        if(daysOfDifference>20)
-        {
+        if(daysOfDifference > 20) {
             refundAmount += flightBooking.getBookingAmount() * 0.95;
-        }
-        else if (daysOfDifference >=10)
-        {
-            refundAmount += flightBooking.getBookingAmount()*0.70;
-        }
-
-        else if(daysOfDifference >=2)
-        {
-            refundAmount += flightBooking.getBookingAmount()*0.40;
-        }
-
-        else
-        {
-            refundAmount += flightBooking.getBookingAmount()*0.0;
-        }
-
-        if("Cancelled".equalsIgnoreCase(flightBooking.getBookingStatus()))
-        {
-            System.out.println("Booking is already cancelled");
+        } else if (daysOfDifference >= 10) {
+            refundAmount += flightBooking.getBookingAmount() * 0.70;
+        } else if(daysOfDifference >= 2) {
+            refundAmount += flightBooking.getBookingAmount() * 0.40;
         }
 
         flightBooking.setBookingStatus("Cancelled");
-        updateFlightBookingStatus(bookingId,"Cancelled");
+        updateFlightBookingStatus(bookingId, "Cancelled");
 
-        FlightSchedule flightSchedule = getFlightScheduleByFlightAndDate(flightBooking.getFlightId(),flightBooking.getDateOfTravel());
+        FlightSchedule flightSchedule = getFlightScheduleByFlightAndDate(flightBooking.getFlightId(), flightBooking.getDateOfTravel());
 
-        if(flightSchedule!=null)
-        {
-            updateFlightScheduleBookedCount(flightBooking.getFlightId(),flightBooking.getDateOfTravel(),flightBooking.getSeatCategory(),flightBooking.getNoOfSeats());
+        if(flightSchedule!= null) {
+            updateFlightScheduleBookedCount(flightBooking.getFlightId(), flightBooking.getDateOfTravel(), flightBooking.getSeatCategory(), flightBooking.getNoOfSeats());
         }
 
-        System.out.println("Booking cancelled successfully. Refund amount: "+refundAmount);
+        System.out.println("Booking cancelled successfully. Refund amount: " + refundAmount);
     }
 
 
@@ -256,6 +243,52 @@ public class BookingDao
                 conn.close();
             }
         }
+    }
+
+    public static FlightBooking getFlightBookingDetailsByFlightId(int flightId) throws SQLException {
+
+        Connection conn = null;
+        PreparedStatement psmt = null;
+        ResultSet rs;
+        FlightBooking flightBooking = null;
+
+        try
+        {
+            conn = DatabaseConnection.getConnection();
+
+            String query = "SELECT date_of_travel FROM flight_booking WHERE flight_id = ?";
+
+            psmt = conn.prepareStatement(query);
+
+            psmt.setInt(1,flightId);
+
+            rs = psmt.executeQuery();
+
+            if (rs.next())
+            {
+                flightBooking = new FlightBooking();
+                flightBooking.setFlightId(flightId);
+                flightBooking.setDateOfTravel(rs.getDate("date_of_travel").toLocalDate());
+            }
+        }
+        catch (ClassNotFoundException | SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        finally
+        {
+            if (psmt != null)
+            {
+                psmt.close();
+            }
+            if (conn != null)
+            {
+                conn.close();
+            }
+        }
+
+        return flightBooking;
     }
 
 }

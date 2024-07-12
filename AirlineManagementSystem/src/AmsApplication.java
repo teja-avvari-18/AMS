@@ -114,9 +114,9 @@ public class AmsApplication
                 case 3:
                     removeCarrierDetails();
                     break;
-//                case 4:
-//                    calculateTotalRefundForCancelledFlights();
-//                    break;
+                case 4:
+                    calculateTotalRefundForCancelledFlights();
+                    break;
                 case 5:
                     System.out.println("Exiting AMS... ");
                     break;
@@ -175,18 +175,18 @@ public class AmsApplication
                 case 2:
                     updateUser();
                     break;
-//                case 3:
-//                    bookFlight();
-//                    break;
-//                case 4:
-//                    calculateRefundAmountForUser();
-//                    break;
+                case 3:
+                    bookFlight();
+                    break;
+                case 4:
+                    calculateRefundAmountForUser();
+                    break;
                 case 5:
                     System.out.println("Exiting AMS ...........");
                     break;
-//                case 6:
-//                    searchFlightsBasedOnOriginDestinationAndDateofTravel();
-//                    break;
+                case 6:
+                    searchFlightsBasedOnOriginDestinationAndDateofTravel();
+                    break;
                 case 7:
                     viewMyBookings();
                     break;

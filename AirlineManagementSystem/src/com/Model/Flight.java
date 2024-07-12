@@ -12,6 +12,9 @@ public class Flight
     private int seatCapacityEconomyClass;
     private int seatCapacityExecutiveClass;
 
+    public Flight() {
+
+    }
 
 
     public int getAirFare() {

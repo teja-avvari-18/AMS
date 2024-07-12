@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class  FlightBooking
 {
-    private static int bookingIdCounter = 1;
+
     private int bookingId;
     private int flightId;
     private int userId;
@@ -79,7 +79,17 @@ public class  FlightBooking
     }
 
     public FlightBooking(int flightId, int userId, int noOfSeats, String seatCategory, LocalDate dateOfTravel, String bookingStatus, int bookingAmount) {
-        this.bookingId = bookingIdCounter++;
+        this.flightId = flightId;
+        this.userId = userId;
+        this.noOfSeats = noOfSeats;
+        this.seatCategory = seatCategory;
+        this.dateOfTravel = dateOfTravel;
+        this.bookingStatus = bookingStatus;
+        this.bookingAmount = bookingAmount;
+    }
+
+    public FlightBooking(int bookingId, int flightId, int userId, int noOfSeats, String seatCategory, LocalDate dateOfTravel, String bookingStatus, int bookingAmount) {
+        this.bookingId = bookingId;
         this.flightId = flightId;
         this.userId = userId;
         this.noOfSeats = noOfSeats;
@@ -90,5 +100,10 @@ public class  FlightBooking
     }
 
     public FlightBooking() {
+    }
+
+    public FlightBooking(int flightId, LocalDate dateOfTravel) {
+        this.flightId = flightId;
+        this.dateOfTravel = dateOfTravel;
     }
 }

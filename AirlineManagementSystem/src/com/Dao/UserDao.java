@@ -1,13 +1,21 @@
 package com.Dao;
 
+import com.Model.Carrier;
+import com.Model.Flight;
 import com.Model.FlightBooking;
 import com.Model.User;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import static com.Dao.BookingDao.getFlightBookingDetailsByFlightId;
+import static com.Dao.BookingDao.getFlightBookingsBasedOnBookingId;
+import static com.Dao.CarrierDao.findCarrierById;
+import static com.Dao.FlightDao.findFlightById;
 
 public class UserDao
 {
@@ -427,6 +435,277 @@ public class UserDao
 
         return bookings;
     }
+
+
+    public static void searchFlightsBasedOnOriginDestinationAndDateofTravel() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter origin");
+        String origin = sc.nextLine();
+
+        System.out.println("Enter destination");
+        String destination = sc.nextLine();
+
+        System.out.println("Enter Date of travel(yyyy-mm-dd)");
+        String dateofTravelStr = sc.nextLine();
+        LocalDate dateofTravel = LocalDate.parse(dateofTravelStr);
+
+        List<Flight> resultFlights = getFlightsBasedonOriginDestinationAndDateofTravel(origin,destination,dateofTravel);
+
+        if(resultFlights.isEmpty())
+        {
+            System.out.println("No flights are present based on the given criteria");
+        }
+
+        else
+        {
+            for(Flight flight:resultFlights)
+            {
+                Carrier carrier = findCarrierById(flight.getCarrierId());
+                FlightBooking flightBooking = getFlightBookingDetailsByFlightId(flight.getFlightId());
+                System.out.println("Flight Id: "+flight.getFlightId());
+                System.out.println("Carrier Name: "+carrier.getCarrierName());
+                System.out.println("Origin: "+flight.getOrigin());
+                System.out.println("Destination: "+flight.getDestination());
+                System.out.println("Air Fare:"+flight.getAirFare());
+                System.out.println("Date of Journey: "+flightBooking.getDateOfTravel());
+            }
+        }
+    }
+
+    public static List<Flight> getFlightsBasedonOriginDestinationAndDateofTravel(String origin, String destination, LocalDate dateofTravel) throws SQLException {
+        List<Flight> flightList = new ArrayList<>();
+
+        Connection conn = null;
+        PreparedStatement psmt = null;
+        ResultSet rs = null;
+
+        try
+        {
+            conn = DatabaseConnection.getConnection();
+            String query = "SELECT flight.flight_id,flight.carrier_id,flight.origin,flight.destination,flight.airfare,flight_booking.date_of_travel " +
+                    "FROM flight " +
+                    "INNER JOIN flight_booking ON flight.flight_id=flight_booking.flight_id " +
+                    "WHERE flight.origin=? AND flight.destination=? AND flight_booking.date_of_travel=?";
+
+            psmt = conn.prepareStatement(query);
+            psmt.setString(1,origin);
+            psmt.setString(2,destination);
+            psmt.setDate(3,Date.valueOf(dateofTravel));
+
+            rs = psmt.executeQuery();
+
+            while (rs.next())
+            {
+                Flight flight = new Flight();
+                flight.setFlightId(rs.getInt("flight_id"));
+                flight.setCarrierId(rs.getInt("carrier_id"));
+                flight.setOrigin(rs.getString("origin"));
+                flight.setDestination(rs.getString("destination"));
+                flight.setAirFare(rs.getInt("airfare"));
+
+                FlightBooking flightBooking = new FlightBooking();
+                flightBooking.setFlightId(rs.getInt("flight_id"));
+                flightBooking.setDateOfTravel(rs.getDate("date_of_travel").toLocalDate());
+
+                flightList.add(flight);
+            }
+
+        }
+        catch (ClassNotFoundException | SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        finally
+        {
+            if(rs!=null) rs.close();
+            if(psmt!=null) psmt.close();
+            if(conn!=null) conn.close();
+        }
+
+        return flightList;
+
+    }
+
+
+    public static void bookFlight() throws SQLException
+    {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter the user id");
+        int userId = sc.nextInt();
+
+        System.out.println("Enter the flight id");
+        int flightId = sc.nextInt();
+
+        System.out.println("Enter the no of seats");
+        int numberOfSeats = sc.nextInt();
+        sc.nextLine();
+
+        System.out.println("Enter the seat category");
+        String seatCategory = sc.nextLine();
+
+        System.out.println("Enter the date of travel (yyyy-mm-dd)");
+        String dateofTravelStr = sc.nextLine();
+        LocalDate dateOfTravel = LocalDate.parse(dateofTravelStr);
+
+        Flight flight = findFlightById(flightId);
+        User user = findUserById(userId);
+
+        if (flight == null) {
+            System.out.println("No Flight is present for the given id " + flightId);
+            return;
+        }
+
+        if (user == null) {
+            System.out.println("User not found for the given user id");
+            return;
+        }
+
+        int availableSeats = flight.getAvailableSeats(seatCategory);
+
+        if (availableSeats < numberOfSeats) {
+            System.out.printf("No seats available under \"%s\" category for booking. Please try searching in another seat category or search for another flight available on this route.%n", seatCategory);
+            return;
+        }
+
+        int bookingAmount = calculateBookingAmount(user, numberOfSeats, seatCategory, flight.getAirFare(), dateOfTravel);
+
+        try
+        {
+            Connection conn = DatabaseConnection.getConnection();
+            String query = "INSERT INTO flight_booking(flight_id,user_id,no_of_seats,seat_category,date_of_travel,booking_status,booking_amount) VALUES(?,?,?,?,?,?,?)";
+            PreparedStatement psmt = conn.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
+
+            psmt.setInt(1,flightId);
+            psmt.setInt(2,userId);
+            psmt.setInt(3,numberOfSeats);
+            psmt.setString(4,seatCategory);
+            psmt.setDate(5,Date.valueOf(dateOfTravel));
+            psmt.setString(6,"Booked");
+            psmt.setInt(7,bookingAmount);
+
+            int affectedRows = psmt.executeUpdate();
+
+            if(affectedRows>0)
+            {
+                try(ResultSet rs = psmt.getGeneratedKeys())
+                {
+                    if(rs.next())
+                    {
+                        int bookingId = rs.getInt(1);
+                        System.out.printf("Booking successful! Booking ID: %d, Amount: %d%n", bookingId, bookingAmount);
+                    }
+                }
+            }
+
+            String updateFlight = "";
+            switch (seatCategory.toLowerCase()) {
+                case "economy":
+                    updateFlight = "UPDATE flight SET seat_capacity_economy_class = seat_capacity_economy_class - ? WHERE flight_id = ?";
+                    break;
+                case "business":
+                    updateFlight = "UPDATE flight SET seat_capacity_business_class = seat_capacity_business_class - ? WHERE flight_id = ?";
+                    break;
+                case "executive":
+                    updateFlight = "UPDATE flight SET seat_capacity_executive_class = seat_capacity_executive_class - ? WHERE flight_id = ?";
+                    break;
+            }
+            try
+            {
+                PreparedStatement updatePsmt = conn.prepareStatement(updateFlight);
+                updatePsmt.setInt(1,numberOfSeats);
+                updatePsmt.setInt(2,flightId);
+                updatePsmt.executeUpdate();
+            } catch (SQLException e) {
+               e.printStackTrace();
+            }
+        }
+        catch (ClassNotFoundException | SQLException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static int calculateBookingAmount(User user, int numberOfSeats, String seatCategory, int airFare, LocalDate dateOfTravel) {
+        int ratePerSeat = 0;
+
+        switch (seatCategory.toLowerCase()) {
+            case "economy":
+                ratePerSeat = airFare;
+                break;
+            case "business":
+                ratePerSeat = airFare * 2;
+                break;
+            case "executive":
+                ratePerSeat = airFare * 5;
+                break;
+        }
+
+        int totalAmount = numberOfSeats * ratePerSeat;
+
+        long numberOfDaysBeforeTravel = ChronoUnit.DAYS.between(LocalDate.now(), dateOfTravel);
+
+        if (numberOfDaysBeforeTravel >= 90) {
+            totalAmount *= 0.95;
+        } else if (numberOfDaysBeforeTravel >= 60) {
+            totalAmount *= 0.97;
+        } else if (numberOfDaysBeforeTravel >= 30) {
+            totalAmount *= 0.98;
+        }
+
+        if (numberOfSeats >= 10) {
+            totalAmount *= 0.98;
+        }
+
+        switch (user.getUserCategory().toLowerCase()) {
+            case "silver":
+                totalAmount *= 0.99;
+                break;
+            case "gold":
+                totalAmount *= 0.98;
+                break;
+            case "platinum":
+                totalAmount *= 0.96;
+                break;
+        }
+
+        return (int) totalAmount;
+    }
+
+    public static void calculateRefundAmountForUser() throws SQLException
+    {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter the booking Id");
+        int bookingId = sc.nextInt();
+        sc.nextLine();
+
+        FlightBooking flightBooking = getFlightBookingsBasedOnBookingId(bookingId);
+
+        double refundAmount = 0.0;
+
+
+        if (flightBooking != null) {
+            LocalDate currentDate = LocalDate.now();
+            long daysDifference = ChronoUnit.DAYS.between(currentDate, flightBooking.getDateOfTravel());
+
+            if (daysDifference > 20) {
+                refundAmount += flightBooking.getBookingAmount() * 0.95;
+            } else if (daysDifference >= 10) {
+                refundAmount += flightBooking.getBookingAmount() * 0.70;
+            } else if (daysDifference >= 2) {
+                refundAmount += flightBooking.getBookingAmount() * 0.40;
+            } else {
+                refundAmount += flightBooking.getBookingAmount() * 0.0;
+            }
+        }
+
+        System.out.printf("Refund Amount is %.2f", refundAmount);
+    }
+
 
 
 

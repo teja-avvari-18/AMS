@@ -3,6 +3,9 @@ package com.Dao;
 import com.Model.Flight;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Scanner;
 
 public class FlightDao
@@ -411,6 +414,75 @@ public class FlightDao
             if(conn!=null) conn.close();
         }
     }
+
+    public static void calculateTotalRefundForCancelledFlights() throws SQLException {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter the flight Id");
+        int flightId = sc.nextInt();
+        sc.nextLine();
+
+        System.out.println("Enter the travel date (yyyy-mm-dd)");
+        String travelDate = sc.nextLine();
+        LocalDate travellingDate = LocalDate.parse(travelDate);
+
+        double totalRefund = 0.0;
+
+        Connection conn = null;
+        PreparedStatement psmt = null;
+        ResultSet rs;
+
+        try
+        {
+            conn = DatabaseConnection.getConnection();
+
+            String query = "SELECT booking_status, booking_amount FROM flight_booking WHERE flight_id=? AND date_of_travel=?";
+
+            psmt = conn.prepareStatement(query);
+            psmt.setInt(1,flightId);
+            psmt.setDate(2,Date.valueOf(travellingDate));
+
+            rs = psmt.executeQuery();
+
+            while (rs.next())
+            {
+                String bookingStatus = rs.getString("booking_status");
+                double bookingAmount = rs.getDouble("booking_amount");
+
+                if("Cancelled".equalsIgnoreCase(bookingStatus))
+                {
+                    totalRefund += bookingAmount;
+                }
+
+                if(ChronoUnit.DAYS.between(LocalDate.now(),travellingDate) <=7)
+                {
+                    totalRefund += bookingAmount*0.10;
+                }
+
+            }
+
+        }
+        catch (ClassNotFoundException | SQLException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (psmt != null)
+            {
+                psmt.close();
+            }
+            if (conn != null)
+            {
+                conn.close();
+            }
+        }
+
+        System.out.printf("Refund Amount is %.2f",totalRefund);
+
+    }
+
+
 
 
 }

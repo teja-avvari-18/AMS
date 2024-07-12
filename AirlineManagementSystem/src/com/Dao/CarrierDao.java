@@ -70,7 +70,7 @@ public class CarrierDao
             try
             {
                 conn = DatabaseConnection.getConnection();
-                String sql = "INSERT INTO carrier (carrier_name, discount_percentage_thirtyDaysAdvanceBooking, discount_percentage_sixtyDaysAdvanceBooking, discount_percentage_ninteyDaysAdvanceBooking, " +
+                String sql = "INSERT INTO carrier (carrier_name, discount_percentage_thirtyDaysAdvanceBooking, discount_percentage_sixtyDaysAdvanceBooking, discount_percentage_ninetyDaysAdvanceBooking, " +
                         "bulk_booking_discount, refund_percentage_for_ticketCancellation_2DaysBeforeTravelDate, refund_percentage_for_ticketCancellation_10DaysBeforeTravelDate , refund_percentage_for_ticketCancellation_20DaysBeforeTravelDate, silver_user_discount, gold_user_discount, platinum_user_discount) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 psmt = conn.prepareStatement(sql);
